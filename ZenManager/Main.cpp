@@ -165,15 +165,14 @@ void CheckRegistry(void) {
     LRESULT lResult;
     HKEY hKey;
 
+    // Open key
     lResult = RegOpenKeyExW(HKEY_LOCAL_MACHINE, szSubKey, 0, KEY_READ, &hKey);
 
     if (lResult != ERROR_SUCCESS) {
-        if (lResult == ERROR_FILE_NOT_FOUND) {
-            _tprintf(TEXT("Previous use of a Cronus Zen is NOT DETECTED on this system!\r\n"));
-        }
+        _tprintf(TEXT("Previous use of a Cronus Zen is NOT DETECTED on this system!\r\n"));
     } else {
         _tprintf(TEXT("Previous use of a Cronus Zen is DETECTED on this system!\r\n"));
-        RegCloseKey(hKey);
+        RegCloseKey(hKey); // Close key
     }
 
     _tprintf(TEXT("\r\n"));
