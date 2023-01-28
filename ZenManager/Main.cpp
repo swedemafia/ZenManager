@@ -64,44 +64,42 @@ ZenStatus FindZen(void) {
     DeviceInfoData.cbSize = sizeof(DeviceInfoData);
 
     // Enumerate list of present USB devices
-    for (unsigned i = 0; ; i++) {
+    for(unsigned i = 0; ; i++) {
         // Check if no more devices are found
         if(!SetupDiEnumDeviceInfo(hDevInfo, i, &DeviceInfoData)) {
             break;
         }
 
         // Search for the Cronus Zen
-        if (SetupDiGetDeviceProperty(hDevInfo, &DeviceInfoData, &DEVPKEY_Device_BusReportedDeviceDesc, &dptPropertyType, (PBYTE)szBusReportedDeviceDesc, sizeof(szBusReportedDeviceDesc), &dwRequiredSize, 0)) {
+        if(SetupDiGetDeviceProperty(hDevInfo, &DeviceInfoData, &DEVPKEY_Device_BusReportedDeviceDesc, &dptPropertyType, (PBYTE)szBusReportedDeviceDesc, sizeof(szBusReportedDeviceDesc), &dwRequiredSize, 0)) {
             
             // See if we found a Cronus Zen ("Cronus Bridge")
-            if (!_tcsncmp(szBusReportedDeviceDesc, TEXT("Cronus Bridge"), lstrlen(TEXT("Cronus Bridge")))) {
+            if(!_tcsncmp(szBusReportedDeviceDesc, TEXT("Cronus Bridge"), lstrlen(TEXT("Cronus Bridge")))) {
 
                 // Cronus Zen found...
                 _tprintf(TEXT("Cronus Zen found...\r\n"));
 
                 // Get Cronus Zen device information...
-                if (SetupDiGetDeviceRegistryProperty(hDevInfo, &DeviceInfoData, SPDRP_DEVICEDESC, &dptPropertyType, (PBYTE)szDeviceDescription, sizeof(szDeviceDescription), &dwRequiredSize)) {
+                if(SetupDiGetDeviceRegistryProperty(hDevInfo, &DeviceInfoData, SPDRP_DEVICEDESC, &dptPropertyType, (PBYTE)szDeviceDescription, sizeof(szDeviceDescription), &dwRequiredSize)) {
                     _tprintf(TEXT("\tDevice Description: %s\r\n"), szDeviceDescription);
                     _tprintf(TEXT("\tBus Reported Device Description: %s\r\n"), szBusReportedDeviceDesc);
 
                     // Get hardware IDs that will be stored in the Registry
-                    if (SetupDiGetDeviceRegistryProperty(hDevInfo, &DeviceInfoData, SPDRP_HARDWAREID, NULL, (PBYTE)szHardwareID, sizeof(szHardwareID), NULL)) {
+                    if(SetupDiGetDeviceRegistryProperty(hDevInfo, &DeviceInfoData, SPDRP_HARDWAREID, NULL, (PBYTE)szHardwareID, sizeof(szHardwareID), NULL)) {
                         _tprintf(TEXT("\tHardware IDs: %s\r\n"), szHardwareID);
 
                         // Determine Cronus vendor ID, product ID and revision
                         pszToken = _tcstok_s(szHardwareID, TEXT("\\#&"), &pszNextToken);
 
-                        while (pszToken != NULL) {
+                        while(pszToken != NULL) {
                             // Check for vendor ID
                             if (!_tcsncmp(pszToken, TEXT("VID_"), lstrlen(TEXT("VID_")))) {
                                 _tcscpy_s(szVid, ARRAY_SIZE(szVid), pszToken);
                                 _tprintf(TEXT("\tVendor ID: %s\r\n"), szVid + lstrlen(TEXT("VID_")));
-                            }
-                            else if (!_tcsncmp(pszToken, TEXT("PID_"), lstrlen(TEXT("PID_")))) {
+                            } else if (!_tcsncmp(pszToken, TEXT("PID_"), lstrlen(TEXT("PID_")))) {
                                 _tcscpy_s(szPid, ARRAY_SIZE(szPid), pszToken);
                                 _tprintf(TEXT("\tProduct ID: %s\r\n"), szPid + lstrlen(TEXT("PID_")));
-                            }
-                            else if (!_tcsncmp(pszToken, TEXT("REV_"), lstrlen(TEXT("REV_")))) {
+                            } else if (!_tcsncmp(pszToken, TEXT("REV_"), lstrlen(TEXT("REV_")))) {
                                 _tcscpy_s(szRev, ARRAY_SIZE(szRev), pszToken);
                                 _tprintf(TEXT("\tRevision: %s\r\n"), szRev + lstrlen(TEXT("REV_")));
                             }
@@ -114,15 +112,15 @@ ZenStatus FindZen(void) {
                         _tprintf(TEXT("\r\n"));
 
                         // See if vendor ID found
-                        if (szVid[0] == '\0')
+                        if(szVid[0] == '\0')
                             return Zen_Missing_VID;
 
                         // See if product ID found
-                        if (szPid[0] == '\0')
+                        if(szPid[0] == '\0')
                             return Zen_Missing_PID;
 
                         // See if revision found
-                        if (szRev[0] == '\0')
+                        if(szRev[0] == '\0')
                             return Zen_Missing_REV;
                     }  else {
                         _tprintf(TEXT("\tUnable to locate Hardware IDs!\r\n"));
